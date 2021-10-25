@@ -10,7 +10,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'hg#xrmfjbgo=wdsxn)tgmouwpd@8z7a+$h)o88n#9h
 
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', ['*'])
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', ['none'])
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -122,8 +122,8 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 6,
+    'DEFAULT_PAGINATION_CLASS': 'users.pagination.StandartPagination',
+    'PAGE_SIZE': 1,
 }
 
 DJOSER = {

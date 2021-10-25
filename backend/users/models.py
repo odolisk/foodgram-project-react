@@ -11,8 +11,15 @@ class User(AbstractUser):
         error_messages={
             'unique': 'Пользователь с таким Email уже существует.',
         })
-    first_name = models.CharField('Имя', max_length=150)
-    last_name = models.CharField('Фамилия', max_length=150)
+    first_name = models.CharField(
+        'Имя',
+        max_length=150,
+        help_text='Обязательное поле. Не более 150 символов.')
+    last_name = models.CharField(
+        'Фамилия',
+        max_length=150,
+        help_text='Обязательное поле. Не более 150 символов.'
+        )
 
     REQUIRED_FIELDS = ('email', 'first_name', 'last_name')
 
