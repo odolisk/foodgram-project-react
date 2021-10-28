@@ -133,3 +133,5 @@ dmypy.json
 
 # http requests
 *.http
+
+media/
