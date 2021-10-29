@@ -1,5 +1,6 @@
 from rest_framework import viewsets
 
+from .filters import IngredientStartFilter
 from .models import Ingredient, Recipe, Tag
 from .serializers import IngredientSerializer, RecipeSerializer, TagSerializer
 
@@ -17,3 +18,4 @@ class TagViewSet(viewsets.ModelViewSet):
 class IngredientViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
+    filterset_class = IngredientStartFilter
