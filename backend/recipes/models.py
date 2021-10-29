@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models import F, Q
 from django.core.validators import MinValueValidator
 
 from colorfield.fields import ColorField
@@ -30,6 +29,7 @@ class Tag(models.Model):
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
+        ordering = ('id', )
 
     def __str__(self):
         return self.name
@@ -48,6 +48,7 @@ class Ingredient(models.Model):
         max_length=50,
         help_text='Введите единицу измерения',
         blank=True,
+        null=True
     )
 
     class Meta:
@@ -158,54 +159,24 @@ class RecipeIngredient(models.Model):
         return f'{self.ingredient} x {self.amount}'
 
 
-class Subscription(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='subscriber',
-        verbose_name='Подписчик',
-    )
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='author',
-        verbose_name='Автор'
-    )
-
-    class Meta:
-        verbose_name = 'Подписка'
-        verbose_name_plural = 'Подписки'
-        constraints = (
-            models.UniqueConstraint(
-                fields=('user', 'author'),
-                name='subscript-users'),
-            models.CheckConstraint(
-                check=~Q(user=F('author')),
-                name='prevent_self_subscribe'),
-        )
-
-    def __str__(self):
-        return f'{self.user.username} to {self.author.username}'
-
-
-class Favourite(models.Model):
+class Favorite(models.Model):
 
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='user_favourites',
+        related_name='user_favorites',
         verbose_name='Пользователь избранного'
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='favour_recipe',
+        related_name='favor_recipe',
         verbose_name='Рецепт в избранном'
     )
 
     class Meta:
-        verbose_name = 'Избранное'
-        verbose_name_plural = 'Избранные'
+        verbose_name = 'Рецепт в избранном'
+        verbose_name_plural = 'Избранные рецепты'
         constraints = (
             models.UniqueConstraint(
                 fields=('user', 'recipe'),
@@ -213,7 +184,7 @@ class Favourite(models.Model):
         )
 
     def __str__(self):
-        return f'{self.user} add {self.recipe} to favourites'
+        return f'{self.user} add {self.recipe} to favorites'
 
 
 class ShoppingList(models.Model):

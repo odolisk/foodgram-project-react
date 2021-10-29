@@ -131,5 +131,8 @@ REST_FRAMEWORK = {
 
 DJOSER = {
     'SEND_ACTIVATION_EMAIL': False,
-    'SERIALIZERS': {},
+    'SERIALIZERS': {
+        'user': 'users.serializers.DetailSerializer',
+        'current_user': 'users.serializers.DetailSerializer',
+    },
 }

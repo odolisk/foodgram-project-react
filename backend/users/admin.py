@@ -4,9 +4,10 @@ from django.contrib.auth.models import Group
 
 from rest_framework.authtoken.models import TokenProxy
 
-from .models import User
+from .models import Subscription, User
 
 
+@admin.register(User)
 class UserAdmin(BaseUserAdmin):
     list_display = ('pk', 'username', 'email', 'first_name',
                     'last_name', 'is_staff', 'is_superuser')
@@ -14,6 +15,11 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('pk', )
 
 
-admin.site.register(User, UserAdmin)
+@admin.register(Subscription)
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'user', 'author')
+    search_fields = ('user', 'author')
+
+
 admin.site.unregister(Group)
 admin.site.unregister(TokenProxy)
