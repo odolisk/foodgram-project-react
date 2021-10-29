@@ -21,9 +21,9 @@ class IngredientAdmin(admin.ModelAdmin):
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'author')
-    search_fields = ('name', 'author', 'tags', 'recipeingredient__ingredient')
+    search_fields = ('name', 'author', 'tags')
     readonly_fields = ('pub_date', )
-    list_filter = ('tags',)
+    list_filter = ('name', 'author', 'tags',)
     inlines = (RecipeIngredientInline,)
 
 

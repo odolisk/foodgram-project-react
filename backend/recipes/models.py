@@ -56,7 +56,7 @@ class Ingredient(models.Model):
         ordering = ('pk', )
 
     def __str__(self):
-        return self.name
+        return f'{self.name}, {self.measurement_unit}'
 
 
 class Recipe(models.Model):
@@ -155,7 +155,7 @@ class RecipeIngredient(models.Model):
         ]
 
     def __str__(self):
-        return 'Ингредиент'
+        return f'{self.ingredient} x {self.amount}'
 
 
 class Subscription(models.Model):
