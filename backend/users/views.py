@@ -1,18 +1,13 @@
 from django.shortcuts import get_object_or_404
-
+from djoser.views import UserViewSet
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-# from djoser.permissions import CurrentUserOrAdmin
-# from djoser.serializers import (SetPasswordSerializer, UserCreateSerializer,
-#                                 UserDeleteSerializer, UserSerializer)
-from djoser.views import UserViewSet
-
 from .models import Subscription, User
 from .pagination import CustomPagination
-from .serializers import (UserDetailSerializer, ShowSubscriptionsSerializer,
-                          SubscribeSerializer)
+from .serializers import (ShowSubscriptionsSerializer, SubscribeSerializer,
+                          UserDetailSerializer)
 
 
 class SubscriptionViewSet(viewsets.ModelViewSet):
