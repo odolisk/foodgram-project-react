@@ -1,15 +1,8 @@
 from rest_framework.routers import DefaultRouter
 
-from django.urls import include, path
-
-
-from .views import SubscriptionViewSet
+from .views import FoodGramUserViewSet
 
 router = DefaultRouter()
-router.register('subscriptions', SubscriptionViewSet, basename='subscriptions')
+router.register('', FoodGramUserViewSet, basename='users')
 
-urlpatterns = [
-    path('users/', include(router.urls)),
-    path('', include('djoser.urls')),
-    path('auth/', include('djoser.urls.authtoken')),
-]
+urlpatterns = router.urls

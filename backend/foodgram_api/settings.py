@@ -125,14 +125,14 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'users.pagination.StandartPagination',
+    'DEFAULT_PAGINATION_CLASS': 'users.pagination.CustomPagination',
     'PAGE_SIZE': 10,
 }
 
 DJOSER = {
     'SEND_ACTIVATION_EMAIL': False,
     'SERIALIZERS': {
-        'user': 'users.serializers.DetailSerializer',
-        'current_user': 'users.serializers.DetailSerializer',
+        'user': 'users.serializers.UserDetailSerializer',
+        'current_user': 'users.serializers.UserDetailSerializer',
     },
 }
