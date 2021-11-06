@@ -1,13 +1,15 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-
+from reportlab.pdfgen import canvas
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from users.pagination import CustomPagination
 from .filters import IngredientStartFilter, RecipeFilter
-from .models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
+from .models import (Favorite, Ingredient, Recipe,
+                     RecipeIngredient, ShoppingCart, Tag)
 from .permissions import IsAuthorOrAdminOrReadOnly
 from .serializers import (
     FavoriteSerializer, IngredientSerializer,
@@ -58,7 +60,8 @@ class FavoriteView(APIView):
         except ObjectDoesNotExist:
             data = {'errors': self.common_del_error_msg}
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        del_data = {'info': 'Рецепт успешно удалён.'}
+        return Response(data=del_data, status=status.HTTP_204_NO_CONTENT)
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -83,5 +86,101 @@ class ManageCartView(FavoriteView):
     common_exist_err_msg = 'Рецепт уже находится в списке покупок.'
 
 
-class DlShoppingCartView(APIView):
-    pass
+class DownloadShoppingCartView(APIView):
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get(self, request):
+        pivot_list = {}
+        ingredients = RecipeIngredient.objects.filter(
+            recipe__author=request.user).values_list(
+            'ingredient__name', 'ingredient__measurement_unit', 'amount')
+        for obj in ingredients:
+            
+            name, measurement_unit, amount = obj
+            if name not in pivot_list:
+                pivot_list[name] = {
+                    'measurement_unit': measurement_unit,
+                    'amount': amount
+                }
+            else:
+                pivot_list[name]['amount'] += amount
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = ('attachment; '
+                                           'filename="shopping_list.pdf"')
+        page = canvas.Canvas(response)
+        page.setFont('TimesNewRoman', size=24)
+        page.drawString(200, 800, 'Список ингредиентов')
+        page.setFont('TimesNewRoman', size=16)
+        height = 750
+        for i, (name, data) in enumerate(pivot_list.items(), 1):
+            page.drawString(75, height, (f'<{i}> {name} - {data["amount"]}, '
+                                         f'{data["measurement_unit"]}'))
+            height -= 25
+        page.showPage()
+        page.save()
+        return response
+
+
+            
+#         shopping_cart = request.user.shopping_cart.all()
+#         buying_list = {}
+
+#         for item in shopping_cart:
+#             ingredients = RecipeIngredient.objects.filter(recipe=item.recipe)
+#             for ingredient in ingredients:
+#                 amount = ingredient.amount
+#                 name = ingredient.ingredient.name
+#                 measurement_unit = ingredient.ingredient.measurement_unit
+
+#                 if name not in buying_list:
+#                     buying_list[name] = {
+#                         'measurement_unit': measurement_unit,
+#                         'amount': amount
+#                     }
+#                 else:
+#                     buying_list[name]['amount'] = (buying_list[name]['amount']
+#                                                    + amount)
+
+#         wishlist = []
+#         for item in buying_list:
+#             wishlist.append(f'{item} - {buying_list[item]["amount"]} '
+#                             f'{buying_list[item]["measurement_unit"]} \n')
+
+#         response = HttpResponse(wishlist, 'Content-Type: text/plain')
+#         response['Content-Disposition'] = 'attachment; filename="wishlist.txt"'
+#         return response
+    # @action(detail=False, methods=['get'],
+    #         permission_classes=[IsAuthenticated])
+    # def download_shopping_cart(self, request):
+    #     final_list = {}
+    #     ingredients = IngredientAmount.objects.filter(
+    #         recipe__cart__user=request.user).values_list(
+    #         'ingredient__name', 'ingredient__measurement_unit',
+    #         'amount')
+    #     for item in ingredients:
+    #         name = item[0]
+    #         if name not in final_list:
+    #             final_list[name] = {
+    #                 'measurement_unit': item[1],
+    #                 'amount': item[2]
+    #             }
+    #         else:
+    #             final_list[name]['amount'] += item[2]
+    #     pdfmetrics.registerFont(
+    #         TTFont('Slimamif', 'Slimamif.ttf', 'UTF-8'))
+    #     response = HttpResponse(content_type='application/pdf')
+    #     response['Content-Disposition'] = ('attachment; '
+    #                                        'filename="shopping_list.pdf"')
+    #     page = canvas.Canvas(response)
+    #     page.setFont('Slimamif', size=24)
+    #     page.drawString(200, 800, 'Список ингредиентов')
+    #     page.setFont('Slimamif', size=16)
+    #     height = 750
+    #     for i, (name, data) in enumerate(final_list.items(), 1):
+    #         page.drawString(75, height, (f'<{i}> {name} - {data["amount"]}, '
+    #                                      f'{data["measurement_unit"]}'))
+    #         height -= 25
+    #     page.showPage()
+    #     page.save()
+    #     return response
