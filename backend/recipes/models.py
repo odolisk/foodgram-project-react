@@ -187,7 +187,7 @@ class Favorite(models.Model):
         return f'{self.user} add {self.recipe} to favorites'
 
 
-class ShoppingList(models.Model):
+class ShoppingCart(models.Model):
 
     user = models.ForeignKey(
         User,

@@ -3,7 +3,7 @@ from drf_base64.fields import Base64ImageField
 
 from .models import (Ingredient, Favorite,
                      Recipe, RecipeIngredient,
-                     ShoppingList, Tag, User)
+                     ShoppingCart, Tag, User)
 from users.serializers import UserDetailSerializer
 
 
@@ -153,7 +153,7 @@ class RecipeShowSerializer(serializers.ModelSerializer):
         if not request or request.user.is_anonymous:
             return False
         user = request.user
-        return ShoppingList.objects.filter(recipe=obj, user=user).exists()
+        return ShoppingCart.objects.filter(recipe=obj, user=user).exists()
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
@@ -166,28 +166,35 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         request = self.context.get('request')
+        exist_err_msg = self.context.get('exist_err_msg')
         recipe = data.get('recipe')
         is_exist = Favorite.objects.filter(
             user=request.user,
             recipe=recipe).exists()
 
         if request.method == 'GET' and is_exist:
-            data = {'errors': 'Подписка уже оформлена.'}
+            data = {'errors': exist_err_msg}
             raise serializers.ValidationError(detail=data)
         return data
 
     def to_representation(self, instance):
         request = self.context.get('request')
         context = {'request': request}
-        return FavoriteRecipeSerializer(
+        return FavoriteShoppingCartRecipeSerializer(
             instance.recipe,
             context=context).data
 
 
-class FavoriteRecipeSerializer(serializers.ModelSerializer):
+class FavoriteShoppingCartRecipeSerializer(serializers.ModelSerializer):
     """
-    For representation Recipe in Favorite.
+    For representation Recipe in Favorite and Shopping Cart.
     """
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
+
+
+class ShoppingCartSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ShoppingCart
