@@ -21,6 +21,8 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
 
 class FoodGramUserViewSet(UserViewSet):
     pagination_class = CustomPagination
+    http_method_names = ('get', 'post', )
+    # permission_classes = (permissions.IsAuthenticated, )
 
     @action(detail=True, methods=('GET', 'DELETE'),
             permission_classes=(permissions.IsAuthenticated, ))

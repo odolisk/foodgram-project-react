@@ -3,7 +3,7 @@ from drf_base64.fields import Base64ImageField
 
 from .models import (Ingredient, Favorite,
                      Recipe, RecipeIngredient,
-                     ShoppingList, Tag)
+                     ShoppingList, Tag, User)
 from users.serializers import UserDetailSerializer
 
 
@@ -15,7 +15,9 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-    """For representation ingredient as is."""
+    """
+    For representation ingredient as is.
+    """
     class Meta:
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit')
@@ -23,6 +25,9 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class IngredientInRecipeSerializer(serializers.ModelSerializer):
+    """
+    For representation RecipeIngredient inside recipe.
+    """
     id = serializers.ReadOnlyField(source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
@@ -34,8 +39,11 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
 
 
 class AddIngredientToRecipeSerializer(serializers.ModelSerializer):
+    """
+    For representation Ingredient inside recipes.
+    """
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
-    amount = serializers.IntegerField()
+    amount = serializers.IntegerField(min_value=1)
 
     class Meta:
         model = RecipeIngredient
@@ -116,7 +124,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
 
 class RecipeShowSerializer(serializers.ModelSerializer):
-    """For representation ingredient in recipe."""
     tags = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     author = UserDetailSerializer(read_only=True)
     ingredients = serializers.SerializerMethodField()
@@ -147,3 +154,40 @@ class RecipeShowSerializer(serializers.ModelSerializer):
             return False
         user = request.user
         return ShoppingList.objects.filter(recipe=obj, user=user).exists()
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
+    class Meta:
+        model = Favorite
+        fields = ('user', 'recipe')
+
+    def validate(self, data):
+        request = self.context.get('request')
+        recipe = data.get('recipe')
+        is_exist = Favorite.objects.filter(
+            user=request.user,
+            recipe=recipe).exists()
+
+        if request.method == 'GET' and is_exist:
+            data = {'errors': 'Подписка уже оформлена.'}
+            raise serializers.ValidationError(detail=data)
+        return data
+
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        context = {'request': request}
+        return FavoriteRecipeSerializer(
+            instance.recipe,
+            context=context).data
+
+
+class FavoriteRecipeSerializer(serializers.ModelSerializer):
+    """
+    For representation Recipe in Favorite.
+    """
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
