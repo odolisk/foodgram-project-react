@@ -136,3 +136,5 @@ DJOSER = {
         'current_user': 'users.serializers.UserDetailSerializer',
     },
 }
+
+FONTS_PATH = os.path.join(BASE_DIR, 'fonts')

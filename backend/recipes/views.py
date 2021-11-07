@@ -1,7 +1,17 @@
+import os
+
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+
+from reportlab.lib.colors import black, blue
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.utils import ImageReader
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
+
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -95,7 +105,7 @@ class DownloadShoppingCartView(APIView):
             recipe__author=request.user).values_list(
             'ingredient__name', 'ingredient__measurement_unit', 'amount')
         for obj in ingredients:
-            
+
             name, measurement_unit, amount = obj
             if name not in pivot_list:
                 pivot_list[name] = {
@@ -108,79 +118,48 @@ class DownloadShoppingCartView(APIView):
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = ('attachment; '
                                            'filename="shopping_list.pdf"')
-        page = canvas.Canvas(response)
-        page.setFont('TimesNewRoman', size=24)
-        page.drawString(200, 800, 'Список ингредиентов')
-        page.setFont('TimesNewRoman', size=16)
-        height = 750
-        for i, (name, data) in enumerate(pivot_list.items(), 1):
-            page.drawString(75, height, (f'<{i}> {name} - {data["amount"]}, '
-                                         f'{data["measurement_unit"]}'))
-            height -= 25
-        page.showPage()
-        page.save()
+        folder = settings.FONTS_PATH
+        ttfFile = os.path.join(folder, 'PTAstraSans-Regular.ttf')
+        pdfmetrics.registerFont(TTFont('PTAstraSans', ttfFile, 'UTF-8'))
+
+        # doc = canvas.Canvas(response, pagesize=A4)
+        doc = canvas.Canvas('1.pdf', pagesize=A4)
+
+        logo_path = os.path.join(settings.STATIC_ROOT, 'logo.png')
+        logo = ImageReader(logo_path)
+        doc.drawImage(logo, 30, 710, mask='auto')
+
+        doc.setFillColor(blue)
+        doc.drawString(270, 820, ('http://odolisk.ru'))
+
+        doc.setFillColor(black)
+        doc.setFont('PTAstraSans', 32)
+        doc.drawString(250, 770, 'Foodgram')
+
+        doc.setFont('PTAstraSans', 18)
+        doc.drawString(170, 720,  'сайт вкусных рецептов для програмистов')
+
+        doc.setDash([1, 1, 3, 3, 1, 4, 4, 1], 0)
+        doc.setLineWidth(1)
+        doc.line(30, 690, 575, 690)
+
+        doc.setDash(1, 0)
+        doc.setFillColor(black)
+        doc.setFont('PTAstraSans', 24)
+        doc.drawString(120, 630, 'Список необходимых ингредиентов')
+
+        doc.setLineWidth(2)
+        doc.line(120, 620, 490, 620)
+
+        doc.setFont('PTAstraSans', 16)
+        height = 570
+        marker_sym = chr(8226)
+        for (name, params) in pivot_list.items():
+            amount = params['amount']
+            mes_unit = params['measurement_unit']
+            list_elem = f'{marker_sym} {name} - {amount} {mes_unit}'
+            doc.drawString(75, height, list_elem)
+            height -= 20
+        doc.showPage()
+        doc.save()
         return response
-
-
-            
-#         shopping_cart = request.user.shopping_cart.all()
-#         buying_list = {}
-
-#         for item in shopping_cart:
-#             ingredients = RecipeIngredient.objects.filter(recipe=item.recipe)
-#             for ingredient in ingredients:
-#                 amount = ingredient.amount
-#                 name = ingredient.ingredient.name
-#                 measurement_unit = ingredient.ingredient.measurement_unit
-
-#                 if name not in buying_list:
-#                     buying_list[name] = {
-#                         'measurement_unit': measurement_unit,
-#                         'amount': amount
-#                     }
-#                 else:
-#                     buying_list[name]['amount'] = (buying_list[name]['amount']
-#                                                    + amount)
-
-#         wishlist = []
-#         for item in buying_list:
-#             wishlist.append(f'{item} - {buying_list[item]["amount"]} '
-#                             f'{buying_list[item]["measurement_unit"]} \n')
-
-#         response = HttpResponse(wishlist, 'Content-Type: text/plain')
-#         response['Content-Disposition'] = 'attachment; filename="wishlist.txt"'
-#         return response
-    # @action(detail=False, methods=['get'],
-    #         permission_classes=[IsAuthenticated])
-    # def download_shopping_cart(self, request):
-    #     final_list = {}
-    #     ingredients = IngredientAmount.objects.filter(
-    #         recipe__cart__user=request.user).values_list(
-    #         'ingredient__name', 'ingredient__measurement_unit',
-    #         'amount')
-    #     for item in ingredients:
-    #         name = item[0]
-    #         if name not in final_list:
-    #             final_list[name] = {
-    #                 'measurement_unit': item[1],
-    #                 'amount': item[2]
-    #             }
-    #         else:
-    #             final_list[name]['amount'] += item[2]
-    #     pdfmetrics.registerFont(
-    #         TTFont('Slimamif', 'Slimamif.ttf', 'UTF-8'))
-    #     response = HttpResponse(content_type='application/pdf')
-    #     response['Content-Disposition'] = ('attachment; '
-    #                                        'filename="shopping_list.pdf"')
-    #     page = canvas.Canvas(response)
-    #     page.setFont('Slimamif', size=24)
-    #     page.drawString(200, 800, 'Список ингредиентов')
-    #     page.setFont('Slimamif', size=16)
-    #     height = 750
-    #     for i, (name, data) in enumerate(final_list.items(), 1):
-    #         page.drawString(75, height, (f'<{i}> {name} - {data["amount"]}, '
-    #                                      f'{data["measurement_unit"]}'))
-    #         height -= 25
-    #     page.showPage()
-    #     page.save()
-    #     return response
