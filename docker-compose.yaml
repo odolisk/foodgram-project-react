@@ -8,7 +8,7 @@ services:
     env_file:
       - .env
   web:
-    build: .
+    image: odolisk/foodgram-project-react
     volumes:
       - static_value:/code/backend/static_web/
       - media_value:/code/backend/media_web:rw
