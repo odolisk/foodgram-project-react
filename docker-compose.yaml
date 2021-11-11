@@ -11,11 +11,11 @@ services:
     image: odolisk/foodgram-project-react
     volumes:
       - static_value:/code/backend/static_web/
-      - media_value:/code/backend/media_web:rw
+      - media_value:/code/backend/media_web/
     command: >
-      sh -c 'python backend/manage.py collectstatic --noinput &&
+      sh -c 'cd backend/ &&
+             python backend/manage.py collectstatic --noinput &&
              python backend/manage.py migrate &&
-             cd backend/ &&
              gunicorn foodgram_api.wsgi:application --bind 0.0.0.0:8000'
     depends_on:
       - db
@@ -38,7 +38,7 @@ services:
       - ./docs/redoc.html:/usr/share/nginx/html/api/docs/redoc.html
       - ./docs/openapi-schema.yml:/usr/share/nginx/html/api/docs/openapi-schema.yml
       - static_value:/var/html/static_web/
-      - media_value:/var/html/media_web:rw
+      - media_value:/var/html/media_web/
     depends_on:
       - web
 volumes:
