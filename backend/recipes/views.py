@@ -4,29 +4,24 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-
 from reportlab.lib.colors import black, blue
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
-
 from rest_framework import permissions, status, viewsets
 from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from users.pagination import CustomPagination
 from .filters import IngredientStartFilter, RecipeFilter
-from .models import (Favorite, Ingredient, Recipe,
-                     RecipeIngredient, ShoppingCart, Tag)
+from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                     ShoppingCart, Tag)
 from .permissions import IsAuthorOrAdminOrReadOnly
-from .serializers import (
-    FavoriteSerializer, IngredientSerializer,
-    RecipeCreateSerializer, RecipeShowSerializer,
-    ShoppingCartSerializer,
-    TagSerializer)
+from .serializers import (FavoriteSerializer, IngredientSerializer,
+                          RecipeCreateSerializer, RecipeShowSerializer,
+                          ShoppingCartSerializer, TagSerializer)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -119,8 +114,8 @@ class DownloadShoppingCartView(APIView):
         response['Content-Disposition'] = ('attachment; '
                                            'filename="shopping_list.pdf"')
         folder = settings.FONTS_PATH
-        ttfFile = os.path.join(folder, 'PTAstraSans-Regular.ttf')
-        pdfmetrics.registerFont(TTFont('PTAstraSans', ttfFile, 'UTF-8'))
+        ttf_file = os.path.join(folder, 'PTAstraSans-Regular.ttf')
+        pdfmetrics.registerFont(TTFont('PTAstraSans', ttf_file, 'UTF-8'))
 
         doc = canvas.Canvas(response, pagesize=A4)
 
@@ -136,7 +131,7 @@ class DownloadShoppingCartView(APIView):
         doc.drawString(250, 770, 'Foodgram')
 
         doc.setFont('PTAstraSans', 18)
-        doc.drawString(170, 720,  'сайт вкусных рецептов для програмистов')
+        doc.drawString(170, 720, 'сайт вкусных рецептов для програмистов')
 
         doc.setDash([1, 1, 3, 3, 1, 4, 4, 1], 0)
         doc.setLineWidth(1)

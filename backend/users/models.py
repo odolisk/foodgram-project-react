@@ -20,7 +20,7 @@ class User(AbstractUser):
         'Фамилия',
         max_length=150,
         help_text='Обязательное поле. Не более 150 символов.'
-        )
+    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ('username', 'first_name', 'last_name')
