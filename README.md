@@ -77,7 +77,7 @@ python manage.py loaddata ../data/fixtures.json
 
 #### Тестовый пользователь
 
-**login:** test@test.odolisk.ru
+**login:** test@odolisk.ru
 **password:** Test0112
 
 ### Автор проекта
