@@ -1,16 +1,13 @@
 import base64
-
 import imghdr
 
 import six
-
 import uuid
-
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 from users.serializers import UserDetailSerializer
 
-from .models import (Ingredient, Favorite, Recipe, RecipeIngredient,
+from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                      ShoppingCart, Tag, User)
 
 
@@ -146,11 +143,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return instance
 
     def to_representation(self, instance):
-        data = RecipeShowSerializer(
+        return RecipeShowSerializer(
             instance,
             context={'request': self.context.get('request')}
         ).data
-        return data
 
 
 class RecipeShowSerializer(serializers.ModelSerializer):
