@@ -43,7 +43,7 @@ sudo docker-compose up -d --build
 ### Создание суперпользователя и заполнение данными
 
 ```bash
-sudo docker exec -it foodgram-project-react_web_1 bash
+sudo docker exec -it <имя контейнера>_web_1 bash
 ```
 
 и далее в терминале
