@@ -1,4 +1,5 @@
 from djoser.serializers import UserSerializer
+from drf_base64.fields import Base64ImageField
 from rest_framework import serializers
 
 from recipes.models import Recipe
@@ -24,6 +25,8 @@ class UserDetailSerializer(UserSerializer):
 
 
 class RecipeSubscriptionSerializer(serializers.ModelSerializer):
+    image = Base64ImageField(required=True)
+
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
@@ -42,7 +45,10 @@ class ShowSubscriptionsSerializer(UserDetailSerializer):
     def get_recipes(self, obj):
         request = self.context.get('request')
         recipes_limit = request.GET.get('recipes_limit', 0)
-        recipes = obj.recipes.all()[:int(recipes_limit)]
+        if int(recipes_limit) > 0:
+            recipes = obj.recipes.all()[:int(recipes_limit)]
+        else:
+            recipes = obj.recipes.all()
         return RecipeSubscriptionSerializer(recipes, many=True).data
 
     def get_recipes_count(self, obj):

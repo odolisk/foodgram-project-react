@@ -13,6 +13,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 
 from rest_framework import permissions, status, viewsets
+from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -32,6 +33,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = CustomPagination
     filterset_class = RecipeFilter
+    parser_classes = (MultiPartParser, JSONParser)
     permission_classes = (IsAuthorOrAdminOrReadOnly, )
     http_method_names = ('get', 'post', 'put', 'delete', )
 
@@ -77,7 +79,6 @@ class FavoriteView(APIView):
 class TagViewSet(viewsets.ModelViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
-    permission_classes = (permissions.IsAuthenticated, )
     http_method_names = ('get', )
 
 
@@ -85,13 +86,12 @@ class IngredientViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
     filterset_class = IngredientStartFilter
-    permission_classes = (permissions.IsAuthenticated, )
     http_method_names = ('get', )
 
 
 class ManageCartView(FavoriteView):
-    model = ShoppingCart
-    serializer = ShoppingCartSerializer
+    common_model = ShoppingCart
+    common_serializer = ShoppingCartSerializer
     common_del_error_msg = 'В списке покупок нет такого рецепта.'
     common_exist_err_msg = 'Рецепт уже находится в списке покупок.'
 
@@ -102,7 +102,7 @@ class DownloadShoppingCartView(APIView):
     def get(self, request):
         pivot_list = {}
         ingredients = RecipeIngredient.objects.filter(
-            recipe__author=request.user).values_list(
+            recipe__shopping_recipe__user=request.user).values_list(
             'ingredient__name', 'ingredient__measurement_unit', 'amount')
         for obj in ingredients:
 
@@ -122,8 +122,7 @@ class DownloadShoppingCartView(APIView):
         ttfFile = os.path.join(folder, 'PTAstraSans-Regular.ttf')
         pdfmetrics.registerFont(TTFont('PTAstraSans', ttfFile, 'UTF-8'))
 
-        # doc = canvas.Canvas(response, pagesize=A4)
-        doc = canvas.Canvas('1.pdf', pagesize=A4)
+        doc = canvas.Canvas(response, pagesize=A4)
 
         logo_path = os.path.join(settings.STATIC_ROOT, 'logo.png')
         logo = ImageReader(logo_path)

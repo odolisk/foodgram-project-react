@@ -134,8 +134,10 @@ dmypy.json
 # http requests
 *.http
 
-media/
+media_web/
 
-static/
+static_web/
 
 .vscode/
+
+postgres_data/
