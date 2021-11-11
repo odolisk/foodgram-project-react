@@ -1,6 +1,6 @@
 # Foodgram - сайт с вкусными рецептами для програмистов
 
-[![foodgram project](https://github.com/odolisk/foodgram-project-react/actions/foodgram_workflow.yml/badge.svg)](https://github.com/odolisk/foodgram-project-react/actions/foodgram_workflow.yml)
+[![foodgram project](https://github.com/odolisk/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)](https://github.com/odolisk/foodgram-project-react/actions/workflows/foodgram_workflow.yml)
 
 <p>
     <a href="https://www.python.org/" rel="nofollow"><img src="https://camo.githubusercontent.com/938bc97e6c0351babffcd724243f78c6654833e451efc6ce3f5d66a635727a9c/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d507974686f6e2d3436343634363f3f7374796c653d666c61742d737175617265266c6f676f3d507974686f6e" alt="Python" data-canonical-src="https://img.shields.io/badge/-Python-464646??style=flat-square&amp;logo=Python" style="max-width:100%;">
