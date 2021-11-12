@@ -31,7 +31,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filterset_class = RecipeFilter
     parser_classes = (MultiPartParser, JSONParser)
     permission_classes = (IsAuthorOrAdminOrReadOnly, )
-    http_method_names = ('get', 'post', 'put', 'delete', )
+    http_method_names = ('get', 'post', 'put', 'patch', 'delete', )
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
