@@ -120,7 +120,7 @@ class DownloadShoppingCartView(APIView):
 
         doc = canvas.Canvas(response, pagesize=A4)
 
-        logo_path = os.path.join(settings.STATIC_ROOT, 'logo.png')
+        logo_path = os.path.join(folder, 'logo.png')
         logo = ImageReader(logo_path)
         doc.drawImage(logo, 30, 710, mask='auto')
 

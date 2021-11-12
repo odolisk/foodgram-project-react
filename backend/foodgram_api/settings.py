@@ -10,7 +10,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'temp_value')
 
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', ['none'])
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split()
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -109,9 +109,6 @@ MEDIA_URL = '/media_web/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media_web')
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.AllowAny',
-    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
     ),

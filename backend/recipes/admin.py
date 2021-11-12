@@ -20,14 +20,15 @@ class IngredientAdmin(admin.ModelAdmin):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'name', 'author', )
-    search_fields = ('name', 'author', 'tags', )
-    readonly_fields = ('pub_date', 'in_favorites', )
-    list_filter = ('name', 'author', 'tags', )
+    list_display = ('pk', 'name', 'author')
+    search_fields = ('name', 'author__username', 'tags__name')
+    readonly_fields = ('pub_date', 'in_favorites')
+    list_filter = ('name', 'author')
+    filter_horizontal = ('tags',)
     inlines = (RecipeIngredientInline,)
 
     def in_favorites(self, obj):
-        return obj.favor_recipe.all().count()
+        return obj.favor_recipe.count()
 
     in_favorites.short_description = 'Добавили в избранное'
 
@@ -35,7 +36,7 @@ class RecipeAdmin(admin.ModelAdmin):
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = ('pk', 'user', 'recipe')
-    search_fields = ('user', 'recipe__name')
+    search_fields = ('user__username', 'recipe__name')
 
 
 @admin.register(ShoppingCart)
