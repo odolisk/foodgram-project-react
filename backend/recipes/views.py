@@ -1,9 +1,5 @@
 import os
 
-from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from reportlab.lib.colors import black, blue
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
@@ -14,8 +10,13 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from users.pagination import CustomPagination
 
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+
+from users.pagination import CustomPagination
 from .filters import IngredientStartFilter, RecipeFilter
 from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                      ShoppingCart, Tag)

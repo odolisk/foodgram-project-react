@@ -3,10 +3,12 @@ import imghdr
 import uuid
 
 import six
-from django.core.files.base import ContentFile
-from rest_framework import serializers
-from users.serializers import UserDetailSerializer
 
+from rest_framework import serializers
+
+from django.core.files.base import ContentFile
+
+from users.serializers import UserDetailSerializer
 from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                      ShoppingCart, Tag, User)
 

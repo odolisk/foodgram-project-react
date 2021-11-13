@@ -42,7 +42,7 @@ class FavoriteAdmin(admin.ModelAdmin):
 @admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
     list_display = ('pk', 'user', 'recipe')
-    search_fields = ('user', 'recipe__name')
+    search_fields = ('user__username', 'recipe__name')
 
 
 @admin.register(Tag)
