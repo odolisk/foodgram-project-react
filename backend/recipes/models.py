@@ -95,7 +95,7 @@ class Recipe(models.Model):
             MinValueValidator(1, 'Время приготовления должно быть не меньше 1')
         ],
         default=1,
-        help_text='Укажите время приготовления в мин (>1)'
+        help_text='Укажите время приготовления в мин (>=1)'
     )
     pub_date = models.DateTimeField(
         'Дата публикации',

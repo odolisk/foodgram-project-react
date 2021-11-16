@@ -7,7 +7,7 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 from rest_framework import permissions, status, viewsets
-from rest_framework.parsers import JSONParser, MultiPartParser
+# from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -30,7 +30,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = CustomPagination
     filterset_class = RecipeFilter
-    parser_classes = (MultiPartParser, JSONParser)
+    # parser_classes = (MultiPartParser, JSONParser)
     permission_classes = (IsAuthorOrAdminOrReadOnly, )
     http_method_names = ('get', 'post', 'put', 'patch', 'delete', )
 
