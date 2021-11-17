@@ -11,7 +11,7 @@ from django.conf import settings
 from django.http import HttpResponse
 
 
-def generate_PDF(pivot_list):
+def generate_PDF(ingredient_list):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = ('attachment; '
                                        'filename="shopping_list.pdf"')
@@ -50,9 +50,10 @@ def generate_PDF(pivot_list):
     doc.setFont('PTAstraSans', 16)
     height = 570
     marker_sym = chr(8226)
-    for (name, params) in pivot_list.items():
-        amount = params['amount']
-        mes_unit = params['measurement_unit']
+    for ingredient in ingredient_list:
+        name = ingredient['ingredient__name']
+        mes_unit = ingredient['ingredient__measurement_unit']
+        amount = ingredient['ingredient_sum']
         list_elem = f'{marker_sym} {name} - {amount} {mes_unit}'
         doc.drawString(75, height, list_elem)
         height -= 20

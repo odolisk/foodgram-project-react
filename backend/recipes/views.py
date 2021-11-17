@@ -12,6 +12,7 @@ from rest_framework.response import Response
 # from rest_framework.views import APIView
 
 # from django.conf import settings
+from django.db.models import Sum
 from django.core.exceptions import ObjectDoesNotExist
 # from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -45,21 +46,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(methods=('get',), detail=False,
             permission_classes=[permissions.IsAuthenticated])
     def download_shopping_cart(self, request):
-        pivot_list = {}
-        ingredients = RecipeIngredient.objects.filter(
-            recipe__shopping_recipe__user=request.user).values_list(
-            'ingredient__name', 'ingredient__measurement_unit', 'amount')
-        for obj in ingredients:
-
-            name, measurement_unit, amount = obj
-            if name not in pivot_list:
-                pivot_list[name] = {
-                    'measurement_unit': measurement_unit,
-                    'amount': amount
-                }
-            else:
-                pivot_list[name]['amount'] += amount
-        return generate_PDF(pivot_list)
+        recipes_ids = [cart.recipe.id for cart in ShoppingCart.objects.filter(
+            user=request.user)]
+        ingredients = RecipeIngredient.objects.values(
+            'ingredient__name',
+            'ingredient__measurement_unit').annotate(
+                ingredient_sum=Sum('amount')).filter(
+                    recipe__id__in=recipes_ids)
+        return generate_PDF(ingredients)
 
     def add_to(self, request, common, pk):
         (model, serializer, del_error_msg,
