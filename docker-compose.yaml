@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   db:
+    container_name: foodgram-db
     image: postgres:12.4
     volumes:
       - ./postgres_data:/var/lib/postgresql/data/
@@ -30,6 +31,7 @@ services:
     volumes:
       - ./frontend/:/app/result_build/
   nginx:
+    container_name: foodgram-nginx
     image: nginx:1.19.3
     ports:
       - '80:80'
