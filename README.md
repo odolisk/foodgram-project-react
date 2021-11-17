@@ -31,7 +31,7 @@ Backend сделан на базе Django Rest Framework. Frontend был пре
 - DB_PORT (5432)
 - SECRET_KEY
 - DEBUG (False)
-- ALLOWED_HOST (['*'])
+- ALLOWED_HOST (localhost)
 
 ### Запуск проекта*
 
@@ -43,7 +43,7 @@ sudo docker-compose up -d --build
 ### Создание суперпользователя и заполнение данными
 
 ```bash
-sudo docker exec -it <имя контейнера>_web_1 bash
+sudo docker exec -it foodgram-project-react bash
 ```
 
 и далее в терминале
@@ -60,7 +60,7 @@ python manage.py loaddata ../data/fixtures.json
 
 ### Инфо
 
-- Документация доступна по адресу **/docs/**
+- Документация доступна по адресу **/api/docs/**
 - Админка **/admin/**
 - API **/api/** (более подробно о эндпоинтах в redoc)
   - Пользователи **users/**
