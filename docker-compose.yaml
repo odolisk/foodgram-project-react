@@ -44,9 +44,6 @@ services:
       - media_value:/var/html/media_web/
     depends_on:
       - web
-networks:
-  default:
-    name: foodgram_network
 volumes:
   static_value:
   media_value:
