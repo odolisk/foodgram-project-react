@@ -9,8 +9,7 @@ services:
       - .env
   web:
     container_name: foodgram-project-react
-    # image: odolisk/foodgram-project-react
-    build: .
+    image: odolisk/foodgram-project-react
     volumes:
       - static_value:/code/backend/static_web/
       - media_value:/code/backend/media_web/
