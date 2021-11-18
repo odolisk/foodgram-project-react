@@ -44,11 +44,11 @@ class ShowSubscriptionsSerializer(UserDetailSerializer):
 
     def get_recipes(self, obj):
         request = self.context.get('request')
-        recipes_limit = request.GET.get('recipes_limit', 0)
-        if int(recipes_limit) > 0:
-            recipes = obj.recipes.all()[:int(recipes_limit)]
-        else:
+        recipes_limit = request.GET.get('recipes_limit')
+        if not recipes_limit or int(recipes_limit) < 1:
             recipes = obj.recipes.all()
+        else:
+            recipes = obj.recipes.all()[:int(recipes_limit)]
         return FavShopCartSubsRecipeSerializer(recipes, many=True).data
 
     def get_recipes_count(self, obj):
@@ -57,7 +57,7 @@ class ShowSubscriptionsSerializer(UserDetailSerializer):
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
-        if not request or request.user.is_anonymous:
+        if request.user.is_anonymous:
             return False
         return obj.subs_authors.exists()
 
@@ -70,19 +70,20 @@ class SubscribeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
         fields = ('id', 'user', 'author')
+        validators = [
+            serializers.UniqueTogetherValidator(
+                queryset=User.objects.all(),
+                fields=('user', 'author'),
+                message='Подписка уже существует'
+            )
+        ]
 
-    def validate(self, data):
+    def validate_author(self, value, data):
         user = data.get('user')
-        author = data.get('author')
+        author = value
         if user == author:
             raise serializers.ValidationError(
                 'Нельзя подписаться на самого себя')
-        is_subs = Subscription.objects.filter(
-            user=user, author=author).exists()
-
-        if is_subs:
-            raise serializers.ValidationError(
-                'Подписка уже существует')
         return data
 
     def to_representation(self, instance):

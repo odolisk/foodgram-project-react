@@ -32,7 +32,7 @@ class FoodGramUserViewSet(UserViewSet):
             return Response(data=data, status=status.HTTP_204_NO_CONTENT)
 
         serializer = SubscribeSerializer(
-            data={'user': request.user.id, 'author': id}
+            data={'user': request.user}
         )
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user)
