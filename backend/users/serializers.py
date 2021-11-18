@@ -1,8 +1,8 @@
 from djoser.serializers import UserSerializer
-from drf_extra_fields.fields import Base64ImageField
-from recipes.models import Recipe
 from rest_framework import serializers
 
+
+from recipes.serializers import FavShopCartSubsRecipeSerializer
 from .models import Subscription, User
 
 
@@ -24,12 +24,12 @@ class UserDetailSerializer(UserSerializer):
         return False
 
 
-class RecipeSubscriptionSerializer(serializers.ModelSerializer):
-    image = Base64ImageField(required=True)
+# class RecipeSubscriptionSerializer(serializers.ModelSerializer):
+#     image = Base64ImageField(required=True)
 
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
+#     class Meta:
+#         model = Recipe
+#         fields = ('id', 'name', 'image', 'cooking_time')
 
 
 class ShowSubscriptionsSerializer(UserDetailSerializer):
@@ -49,7 +49,7 @@ class ShowSubscriptionsSerializer(UserDetailSerializer):
             recipes = obj.recipes.all()[:int(recipes_limit)]
         else:
             recipes = obj.recipes.all()
-        return RecipeSubscriptionSerializer(recipes, many=True).data
+        return FavShopCartSubsRecipeSerializer(recipes, many=True).data
 
     def get_recipes_count(self, obj):
         queryset = obj.recipes.all()

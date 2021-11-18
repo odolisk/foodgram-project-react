@@ -40,7 +40,7 @@ sudo docker-compose pull
 sudo docker-compose up -d --build
 ```
 
-### Создание суперпользователя и заполнение данными
+### Создание суперпользователя и заполнение данными (ингредиенты)
 
 ```bash
 sudo docker exec -it foodgram-project-react bash
@@ -53,7 +53,7 @@ cd backend/
 
 python manage.py createsuperuser
 
-python manage.py loaddata ../data/fixtures.json 
+python manage.py loaddata ../data/ingredients.xml
 ```
 
 \* Для GitBash под Windows команды вводятся без sudo
