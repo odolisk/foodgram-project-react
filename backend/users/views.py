@@ -24,16 +24,18 @@ class FoodGramUserViewSet(UserViewSet):
             permission_classes=(permissions.IsAuthenticated, ))
     def subscribe(self, request, id):
         author = get_object_or_404(User, id=id)
+
         if request.method == 'DELETE':
             subs = get_object_or_404(
                 Subscription, user=request.user, author=author)
             subs.delete()
             data = {'detail': f'{request.user} отписан от {author}'}
             return Response(data=data, status=status.HTTP_204_NO_CONTENT)
-
         serializer = SubscribeSerializer(
-            data={'user': request.user}
+            data={'user': request.user.id,
+                  'author': author.id}
         )
+
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user)
         serializer = UserDetailSerializer(

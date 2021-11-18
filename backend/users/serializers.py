@@ -64,19 +64,19 @@ class SubscribeSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'author')
         validators = [
             serializers.UniqueTogetherValidator(
-                queryset=User.objects.all(),
+                queryset=Subscription.objects.all(),
                 fields=('user', 'author'),
                 message='Подписка уже существует'
             )
         ]
 
-    def validate_author(self, value, data):
-        user = data.get('user')
+    def validate_author(self, value):
+        user = self.initial_data.get('user')
         author = value
         if user == author:
             raise serializers.ValidationError(
                 'Нельзя подписаться на самого себя')
-        return data
+        return value
 
     def to_representation(self, instance):
         request = self.context.get('request')
