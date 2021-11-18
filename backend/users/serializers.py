@@ -2,7 +2,7 @@ from djoser.serializers import UserSerializer
 from rest_framework import serializers
 
 
-from recipes.serializers import FavShopCartSubsRecipeSerializer
+from recipes.commons import FavShopCartSubsRecipeSerializer
 from .models import Subscription, User
 
 

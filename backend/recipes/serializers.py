@@ -2,6 +2,8 @@ from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
 from users.serializers import UserDetailSerializer
+
+from .commons import FavShopCartSubsRecipeSerializer
 from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                      ShoppingCart, Tag, User)
 
@@ -181,12 +183,12 @@ class RecipeShowSerializer(serializers.ModelSerializer):
         return self.get_is_any(obj, ShoppingCart)
 
 
-class FavShopCartSubsRecipeSerializer(serializers.ModelSerializer):
-    image = Base64ImageField(required=True)
+# class FavShopCartSubsRecipeSerializer(serializers.ModelSerializer):
+#     image = Base64ImageField(required=True)
 
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
+#     class Meta:
+#         model = Recipe
+#         fields = ('id', 'name', 'image', 'cooking_time')
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
