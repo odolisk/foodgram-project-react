@@ -183,14 +183,6 @@ class RecipeShowSerializer(serializers.ModelSerializer):
         return self.get_is_any(obj, ShoppingCart)
 
 
-# class FavShopCartSubsRecipeSerializer(serializers.ModelSerializer):
-#     image = Base64ImageField(required=True)
-
-#     class Meta:
-#         model = Recipe
-#         fields = ('id', 'name', 'image', 'cooking_time')
-
-
 class FavoriteSerializer(serializers.ModelSerializer):
     recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())

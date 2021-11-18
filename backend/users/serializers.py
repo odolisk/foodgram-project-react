@@ -24,14 +24,6 @@ class UserDetailSerializer(UserSerializer):
         return False
 
 
-# class RecipeSubscriptionSerializer(serializers.ModelSerializer):
-#     image = Base64ImageField(required=True)
-
-#     class Meta:
-#         model = Recipe
-#         fields = ('id', 'name', 'image', 'cooking_time')
-
-
 class ShowSubscriptionsSerializer(UserDetailSerializer):
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
