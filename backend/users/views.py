@@ -14,6 +14,7 @@ from .serializers import (ShowSubscriptionsSerializer, SubscribeSerializer,
 class FoodGramUserViewSet(UserViewSet):
     pagination_class = CustomPagination
     http_method_names = ('get', 'post', 'delete')
+    permission_classes = permissions.AllowAny
 
     def destroy(self, request, *args, **kwargs):
         data = {'detail': 'Метод \"DELETE\" не разрешен.'}
@@ -21,7 +22,7 @@ class FoodGramUserViewSet(UserViewSet):
 
     @action(detail=True, methods=('get', 'delete', ),
             url_path='subscribe',
-            permission_classes=(permissions.IsAuthenticated, ))
+            permission_classes=(permissions.IsAuthenticated,))
     def subscribe(self, request, id):
         author = get_object_or_404(User, id=id)
 
