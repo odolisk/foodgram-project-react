@@ -11,7 +11,7 @@ class UserAdmin(BaseUserAdmin):
     list_display = ('pk', 'username', 'email', 'first_name',
                     'last_name', 'is_staff', 'is_superuser')
     search_fields = ('email', 'username')
-    ordering = ('pk', )
+    ordering = ('pk',)
 
 
 @admin.register(Subscription)

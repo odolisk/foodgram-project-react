@@ -1,6 +1,8 @@
 import os
 
 from dotenv import load_dotenv
+from rest_framework import permissions
+
 
 load_dotenv()
 
@@ -123,6 +125,12 @@ DJOSER = {
         'user': 'users.serializers.UserDetailSerializer',
         'current_user': 'users.serializers.UserDetailSerializer',
     },
+    'PERMISSIONS': {
+        'user': [permissions.AllowAny],
+        'user_list': [permissions.AllowAny],
+    },
 }
 
 FONTS_PATH = os.path.join(BASE_DIR, 'fonts')
+
+DEFAULT_RECIPES_LIMIT = 10

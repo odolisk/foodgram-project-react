@@ -34,16 +34,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(methods=('get',), detail=False,
             permission_classes=[permissions.IsAuthenticated])
     def download_shopping_cart(self, request):
-        recipes_ids = [cart.recipe.id for cart in ShoppingCart.objects.filter(
-            user=request.user)]
         ingredients = RecipeIngredient.objects.values(
             'ingredient__name',
             'ingredient__measurement_unit').annotate(
                 ingredient_sum=Sum('amount')).filter(
-                    recipe__id__in=recipes_ids)
+                    recipe__id__in=request.user.shopping_user.values(
+                        'recipe_id'))
         return generate_PDF(ingredients)
 
-    def add_to(self, request, common, pk):
+    def __add_to(self, request, common, pk):
         (model, serializer, del_error_msg,
          del_success_msg, exist_err_msg) = common
         if request.method == 'GET':
@@ -80,7 +79,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                   del_error_msg,
                   del_success_msg,
                   exist_err_msg)
-        return self.add_to(request, common, pk)
+        return self.__add_to(request, common, pk)
 
     @action(methods=('get', 'delete'), detail=True,
             permission_classes=[permissions.IsAuthenticated])
@@ -95,7 +94,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                   del_error_msg,
                   del_success_msg,
                   exist_err_msg)
-        return self.add_to(request, common, pk)
+        return self.__add_to(request, common, pk)
 
 
 class TagViewSet(viewsets.ModelViewSet):

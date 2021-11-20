@@ -1,6 +1,7 @@
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
 
+from django.conf import settings
 
 from recipes.commons import FavShopCartSubsRecipeSerializer
 from .models import Subscription, User
@@ -15,19 +16,14 @@ class UserDetailSerializer(UserSerializer):
                   'is_subscribed')
 
     def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-        if request is None or request.user.is_anonymous:
-            return False
-        user = request.user
-        if user.subs_subscribers.filter(author=obj).exists():
-            return True
-        return False
+        user = self.context.get('request').user
+        return (not user.is_anonymous
+                and user.subs_subscribers.filter(author=obj).exists())
 
 
 class ShowSubscriptionsSerializer(UserDetailSerializer):
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
-    is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -35,23 +31,14 @@ class ShowSubscriptionsSerializer(UserDetailSerializer):
                   'last_name', 'is_subscribed', 'recipes', 'recipes_count')
 
     def get_recipes(self, obj):
-        request = self.context.get('request')
-        recipes_limit = request.GET.get('recipes_limit')
+        recipes_limit = self.context.get('recipe_limit', None)
         if not recipes_limit or int(recipes_limit) < 1:
-            recipes = obj.recipes.all()
-        else:
-            recipes = obj.recipes.all()[:int(recipes_limit)]
+            recipes_limit = settings.DEFAULT_RECIPES_LIMIT
+        recipes = obj.recipes.all()[:int(recipes_limit)]
         return FavShopCartSubsRecipeSerializer(recipes, many=True).data
 
     def get_recipes_count(self, obj):
-        queryset = obj.recipes.all()
-        return queryset.count()
-
-    def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-        if request.user.is_anonymous:
-            return False
-        return obj.subs_authors.exists()
+        return obj.recipes.count()
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
@@ -80,6 +67,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         request = self.context.get('request')
+        print(request)
         context = {'request': request}
         return ShowSubscriptionsSerializer(
             instance.author,

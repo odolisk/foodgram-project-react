@@ -14,13 +14,12 @@ from .serializers import (ShowSubscriptionsSerializer, SubscribeSerializer,
 class FoodGramUserViewSet(UserViewSet):
     pagination_class = CustomPagination
     http_method_names = ('get', 'post', 'delete')
-    permission_classes = permissions.AllowAny
 
     def destroy(self, request, *args, **kwargs):
         data = {'detail': 'Метод \"DELETE\" не разрешен.'}
         return Response(data=data, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    @action(detail=True, methods=('get', 'delete', ),
+    @action(detail=True, methods=('get', 'delete'),
             url_path='subscribe',
             permission_classes=(permissions.IsAuthenticated,))
     def subscribe(self, request, id):
@@ -36,7 +35,6 @@ class FoodGramUserViewSet(UserViewSet):
             data={'user': request.user.id,
                   'author': author.id}
         )
-
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user)
         serializer = UserDetailSerializer(
@@ -44,14 +42,17 @@ class FoodGramUserViewSet(UserViewSet):
         return Response(
             serializer.data, status=status.HTTP_201_CREATED)
 
-    @action(detail=False, methods=('GET', ),
-            permission_classes=(permissions.IsAuthenticated, ))
+    @action(detail=False, methods=('GET',),
+            permission_classes=(permissions.IsAuthenticated,))
     def subscriptions(self, request):
         users = User.objects.filter(subs_authors__user=request.user)
         paginator = PageNumberPagination()
         paginator.page_size = 6
         page = paginator.paginate_queryset(users, request)
         serializer = ShowSubscriptionsSerializer(
-            page, many=True, context={'request': request})
-
+            page,
+            many=True,
+            context={
+                'request': request,
+                'recipe_limit': request.query_params.get('recipe_limit')})
         return paginator.get_paginated_response(serializer.data)
