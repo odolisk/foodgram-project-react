@@ -48,14 +48,10 @@ class AddIngredientToRecipeSerializer(serializers.ModelSerializer):
     """
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
     amount = serializers.IntegerField(min_value=1)
-    measurement_unit = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='measurement_unit'
-    )
 
     class Meta:
         model = RecipeIngredient
-        fields = ('id', 'amount', 'measurement_unit')
+        fields = ('id', 'amount')
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
@@ -75,18 +71,11 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def validate_ingredients(self, ingredients):
         uniq_ingredients = {}
         for ingredient in ingredients:
-            if ingredient['id'] in uniq_ingredients:
-                uniq_ingredients[ingredient['id']] += ingredient['amount']
-            else:
-                uniq_ingredients[ingredient['id']] = ingredient['amount']
-        validated_data = []
-        for val_ingredient in uniq_ingredients:
-            validated_data.append(
-                {
-                    'id': val_ingredient,
-                    'amount': uniq_ingredients[val_ingredient]
-                }
-            )
+            uniq_ingredients[ingredient['id']] = uniq_ingredients.get(
+                ingredient['id'], 0) + ingredient['amount']
+        validated_data = [
+            {'id': val,
+             'amount': uniq_ingredients[val]} for val in uniq_ingredients]
         return validated_data
 
     def create(self, validated_data):
@@ -116,7 +105,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 recipe=instance,
                 amount=ing['amount']) for ing in ingredients]
         RecipeIngredient.objects.bulk_create(obj)
-        instance.save()
         return super().update(instance, validated_data)
 
     def to_representation(self, instance):
@@ -146,10 +134,9 @@ class RecipeShowSerializer(serializers.ModelSerializer):
         return IngredientInRecipeSerializer(queryset, many=True).data
 
     def __get_is_any(self, obj, model):
-        request = self.context.get('request')
-        if not request or request.user.is_anonymous:
+        user = self.context.get('request').user
+        if user.is_anonymous:
             return False
-        user = request.user
         return model.objects.filter(recipe=obj, user=user).exists()
 
     def get_is_favorited(self, obj):

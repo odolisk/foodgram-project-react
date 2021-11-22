@@ -11,19 +11,19 @@ class IngredientStartFilter(filters.FilterSet):
 
     class Meta:
         model = Ingredient
-        fields = ('name', 'measurement_unit')
+        fields = ()
 
 
 class RecipeFilter(filters.FilterSet):
     """Filter Recipe by tags(slug), by author (id), by present in
     shopping cart (bool) and present in favorite of current user (bool)."""
-    tags = filters.AllValuesMultipleFilter(field_name='tags__slug')
+    tags = filters.MultipleChoiceFilter(field_name='tags__slug')
     is_favorited = filters.BooleanFilter(method='get_in_favorite')
     is_in_shopping_cart = filters.BooleanFilter(method='get_in_shopping_cart')
 
     class Meta:
         model = Recipe
-        fields = ('author', 'tags', 'is_favorited', 'is_in_shopping_cart')
+        fields = ('author',)
 
     def get_in_favorite(self, queryset, name, value):
         if value:

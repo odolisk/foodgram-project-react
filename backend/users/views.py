@@ -13,13 +13,13 @@ from .serializers import (ShowSubscriptionsSerializer, SubscribeSerializer,
 
 class FoodGramUserViewSet(UserViewSet):
     pagination_class = CustomPagination
-    http_method_names = ('get', 'post', 'delete')
+    http_method_names = ('get')  # , 'post')  #, 'delete')
 
-    def destroy(self, request, *args, **kwargs):
-        data = {'detail': 'Метод \"DELETE\" не разрешен.'}
-        return Response(data=data, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    # def destroy(self, request, *args, **kwargs):
+    #     data = {'detail': 'Метод \"DELETE\" не разрешен.'}
+    #     return Response(data=data, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    @action(detail=True, methods=('get', 'delete'),
+    @action(detail=True, methods=('get', 'post'),
             url_path='subscribe',
             permission_classes=(permissions.IsAuthenticated,))
     def subscribe(self, request, id):

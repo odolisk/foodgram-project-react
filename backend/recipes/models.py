@@ -9,7 +9,7 @@ from users.models import User
 class Tag(models.Model):
     name = models.CharField(
         verbose_name='Имя тега',
-        max_length=50,
+        max_length=200,
         help_text='Введите имя тега',
         unique=True
     )
@@ -20,6 +20,7 @@ class Tag(models.Model):
     )
     slug = models.SlugField(
         verbose_name='Идентификатор тега',
+        max_length=200,
         unique=True,
         help_text='Укажите идентификатор тега')
 
@@ -35,12 +36,12 @@ class Tag(models.Model):
 class Ingredient(models.Model):
     name = models.CharField(
         verbose_name='Название ингредиента',
-        max_length=150,
+        max_length=200,
         help_text='Введите название ингредиента'
     )
     measurement_unit = models.CharField(
         verbose_name='Единица измерения',
-        max_length=50,
+        max_length=200,
         help_text='Введите единицу измерения'
     )
 
@@ -67,7 +68,7 @@ class Recipe(models.Model):
     )
     name = models.CharField(
         verbose_name='Наименование',
-        max_length=150,
+        max_length=200,
         help_text='Введите наименование рецепта'
     )
     image = models.ImageField(

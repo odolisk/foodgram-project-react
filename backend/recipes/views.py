@@ -34,12 +34,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(methods=('get',), detail=False,
             permission_classes=[permissions.IsAuthenticated])
     def download_shopping_cart(self, request):
-        ingredients = RecipeIngredient.objects.values(
+        # ingredients = RecipeIngredient.objects.values(
+        #     'ingredient__name',
+        #     'ingredient__measurement_unit'
+        # ).annotate(
+        #     ingredient_sum=Sum('amount')
+        # ).filter(
+        #     recipe__id__in=request.user.shopping_user.values('recipe_id'))
+        ingredients = RecipeIngredient.objects.filter(
+            recipe__id__in=request.user.shopping_user.values('recipe_id')
+        ).values(
             'ingredient__name',
-            'ingredient__measurement_unit').annotate(
-                ingredient_sum=Sum('amount')).filter(
-                    recipe__id__in=request.user.shopping_user.values(
-                        'recipe_id'))
+            'ingredient__measurement_unit'
+        ).annotate(
+            ingredient_sum=Sum('amount'))
         return generate_PDF(ingredients)
 
     def __add_to(self, request, common, pk):

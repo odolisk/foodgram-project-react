@@ -21,9 +21,9 @@ class IngredientAdmin(admin.ModelAdmin):
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'author')
-    search_fields = ('name', 'author__username', 'tags__name')
+    search_fields = ('name', 'author__username')
     readonly_fields = ('pub_date', 'in_favorites')
-    list_filter = ('name', 'author')
+    list_filter = ('author', 'tags__name')
     filter_horizontal = ('tags',)
     inlines = (RecipeIngredientInline,)
 
@@ -48,5 +48,5 @@ class ShoppingCartAdmin(admin.ModelAdmin):
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'color', 'slug')
-    search_fields = ('name', 'color')
+    search_fields = ('name',)
     prepopulated_fields = {'slug': ('name',)}
