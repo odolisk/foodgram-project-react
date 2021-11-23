@@ -3,9 +3,9 @@ from rest_framework import serializers
 
 from users.serializers import UserDetailSerializer
 
-from .commons import FavShopCartSubsRecipeSerializer
+from .commons import CreateDeleteSerializerMixin
 from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                     ShoppingCart, Tag, User)
+                     ShoppingCart, Tag)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -146,57 +146,31 @@ class RecipeShowSerializer(serializers.ModelSerializer):
         return self.__get_is_any(obj, ShoppingCart)
 
 
-class FavoriteSerializer(serializers.ModelSerializer):
+class FavoriteSerializer(CreateDeleteSerializerMixin,
+                         serializers.ModelSerializer):
 
     class Meta:
         model = Favorite
         fields = ('user', 'recipe')
-
-    def validate(self, data):
-        request = self.context.get('request')
-        exist_err_msg = self.context.get('exist_err_msg')
-        recipe = data.get('recipe')
-        is_exist = Favorite.objects.filter(
-            user=request.user,
-            recipe=recipe).exists()
-
-        if request.method == 'GET' and is_exist:
-            data = {'errors': exist_err_msg}
-            raise serializers.ValidationError(detail=data)
-        return data
-
-    def to_representation(self, instance):
-        request = self.context.get('request')
-        context = {'request': request}
-        return FavShopCartSubsRecipeSerializer(
-            instance.recipe,
-            context=context).data
+        validators = [
+            serializers.UniqueTogetherValidator(
+                queryset=Favorite.objects.all(),
+                fields=('user', 'recipe'),
+                message='Рецепт уже находится в избранном.'
+            )
+        ]
 
 
-class ShoppingCartSerializer(serializers.ModelSerializer):
-    recipe = serializers.PrimaryKeyRelatedField(queryset=Recipe.objects.all())
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+class ShoppingCartSerializer(CreateDeleteSerializerMixin,
+                             serializers.ModelSerializer):
 
     class Meta:
         model = ShoppingCart
         fields = ('user', 'recipe')
-
-    def validate(self, data):
-        request = self.context.get('request')
-        exist_err_msg = self.context.get('exist_err_msg')
-        recipe = data.get('recipe')
-        is_exist = ShoppingCart.objects.filter(
-            user=request.user,
-            recipe=recipe).exists()
-
-        if request.method == 'GET' and is_exist:
-            data = {'errors': exist_err_msg}
-            raise serializers.ValidationError(detail=data)
-        return data
-
-    def to_representation(self, instance):
-        request = self.context.get('request')
-        context = {'request': request}
-        return FavShopCartSubsRecipeSerializer(
-            instance.recipe,
-            context=context).data
+        validators = [
+            serializers.UniqueTogetherValidator(
+                queryset=ShoppingCart.objects.all(),
+                fields=('user', 'recipe'),
+                message='Рецепт уже находится в списке покупок.'
+            )
+        ]
