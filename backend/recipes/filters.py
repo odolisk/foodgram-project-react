@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django_filters import rest_framework as filters
 
 from .models import Ingredient, Recipe
@@ -25,19 +26,20 @@ class RecipeFilter(filters.FilterSet):
         model = Recipe
         fields = ('author',)
 
-    def __get_in(self, queryset, name, value, **kwargs):
+    def __get_in(self, queryset, name, value, field_name):
+        field = Q(**{field_name: self.request.user})
         if value:
-            return queryset.filter(**kwargs)
+            return queryset.filter(field)
         return queryset
 
     def get_in_favorite(self, queryset, name, value):
-        kwargs = {
-            'favor_recipe__user': self.request.user
-        }
-        return self.__get_in(queryset, name, value, kwargs)
+        # if value:
+        #     return queryset.filter(favor_recipe__user=self.request.user)
+        # return queryset
+        return self.__get_in(queryset, name, value, 'favor_recipe__user')
 
     def get_in_shopping_cart(self, queryset, name, value):
-        kwargs = {
-            'shopping_recipe__user': self.request.user
-        }
-        return self.__get_in(queryset, name, value, kwargs)
+        # if value:
+        #     return queryset.filter(shopping_recipe__user=self.request.user)
+        # return queryset
+        return self.__get_in(queryset, name, value, 'shopping_recipe__user')
