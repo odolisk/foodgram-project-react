@@ -1,7 +1,7 @@
 from django.db.models import Q
 from django_filters import rest_framework as filters
 
-from .models import Ingredient, Recipe
+from .models import Ingredient, Recipe, Tag
 
 
 class IngredientStartFilter(filters.FilterSet):
@@ -18,7 +18,10 @@ class IngredientStartFilter(filters.FilterSet):
 class RecipeFilter(filters.FilterSet):
     """Filter Recipe by tags(slug), by author (id), by present in
     shopping cart (bool) and present in favorite of current user (bool)."""
-    tags = filters.MultipleChoiceFilter(field_name='tags__slug')
+    tags = filters.ModelMultipleChoiceFilter(
+        field_name='tags__slug',
+        to_field_name='slug',
+        queryset=Tag.objects.all())
     is_favorited = filters.BooleanFilter(method='get_in_favorite')
     is_in_shopping_cart = filters.BooleanFilter(method='get_in_shopping_cart')
 
