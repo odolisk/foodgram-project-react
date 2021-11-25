@@ -130,5 +130,6 @@ class TagViewSet(viewsets.ModelViewSet):
 class IngredientViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     queryset = Ingredient.objects.all()
+    pagination_class = None
     filterset_class = IngredientStartFilter
     http_method_names = ('get',)
