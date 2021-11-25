@@ -12,7 +12,8 @@ class FavShopCartSubsRecipeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
-class CreateDeleteSerializerMixin:
+class ShowRecipeSerializerMixin:
+
     def to_representation(self, instance):
         request = self.context.get('request')
         context = {'request': request}

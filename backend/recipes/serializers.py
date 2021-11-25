@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from users.serializers import UserDetailSerializer
 
-from .commons import CreateDeleteSerializerMixin
+from .commons import ShowRecipeSerializerMixin
 from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                      ShoppingCart, Tag)
 
@@ -74,8 +74,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             uniq_ingredients[ingredient['id']] = uniq_ingredients.get(
                 ingredient['id'], 0) + ingredient['amount']
         validated_data = [
-            {'id': val,
-             'amount': uniq_ingredients[val]} for val in uniq_ingredients]
+            {'id': key,
+             'amount': value} for key, value in uniq_ingredients.items()]
         return validated_data
 
     def create(self, validated_data):
@@ -146,7 +146,7 @@ class RecipeShowSerializer(serializers.ModelSerializer):
         return self.__get_is_any(obj, ShoppingCart)
 
 
-class FavoriteSerializer(CreateDeleteSerializerMixin,
+class FavoriteSerializer(ShowRecipeSerializerMixin,
                          serializers.ModelSerializer):
 
     class Meta:
@@ -161,7 +161,7 @@ class FavoriteSerializer(CreateDeleteSerializerMixin,
         ]
 
 
-class ShoppingCartSerializer(CreateDeleteSerializerMixin,
+class ShoppingCartSerializer(ShowRecipeSerializerMixin,
                              serializers.ModelSerializer):
 
     class Meta:

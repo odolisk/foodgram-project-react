@@ -20,6 +20,7 @@ from .utils import generate_PDF
 
 
 class CreateDeleteObjMixin:
+
     def create_obj(self, request, create_data):
         data = {
             'user': request.user.id,
