@@ -5,7 +5,6 @@ from django.db.models import F, Q
 
 
 class User(AbstractUser):
-    username_validator = UnicodeUsernameValidator()
     email = models.EmailField(
         'email',
         unique=True,
@@ -19,7 +18,7 @@ class User(AbstractUser):
         unique=True,
         help_text=('Обязательное поле. Не более 150 символов. '
                    'Буквы, цифры и символы @/./+/-/_'),
-        validators=[username_validator],
+        validators=[UnicodeUsernameValidator()],
         error_messages={
             'unique': 'Пользователь с таким логином уже существует.',
         },
@@ -50,13 +49,13 @@ class Subscription(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='subs_subscribers',
+        related_name='subscribers',
         verbose_name='Подписчик',
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='subs_authors',
+        related_name='authors',
         verbose_name='Автор'
     )
 

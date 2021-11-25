@@ -1,22 +1,25 @@
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
 
-from recipes.commons import FavShopCartSubsRecipeSerializer
+from django.conf import settings
+
+from recipes.commons import ShortRecipeSerializer
 from .models import Subscription, User
 
 
 class UserDetailSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
-    class Meta(UserSerializer.Meta):
+    class Meta:
+        model = User
         fields = ('email', 'id', 'username',
                   'first_name', 'last_name',
                   'is_subscribed')
 
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
-        return (not user.is_anonymous
-                and user.subs_subscribers.filter(author=obj).exists())
+        return (user.is_authenticated
+                and user.subscribers.filter(author=obj).exists())
 
 
 class ShowSubscriptionsSerializer(UserDetailSerializer):
@@ -29,9 +32,16 @@ class ShowSubscriptionsSerializer(UserDetailSerializer):
                   'last_name', 'is_subscribed', 'recipes', 'recipes_count')
 
     def get_recipes(self, obj):
-        recipes_limit = self.context.get('recipes_limit')
+        param = self.context.get('request').query_params.get(
+            'recipes_limit')
+        try:
+            recipes_limit = int(param)
+            if recipes_limit < 1:
+                raise ValueError
+        except (ValueError, TypeError):
+            recipes_limit = settings.DEFAULT_RECIPES_LIMIT
         recipes = obj.recipes.all()[:recipes_limit]
-        return FavShopCartSubsRecipeSerializer(recipes, many=True).data
+        return ShortRecipeSerializer(recipes, many=True).data
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
@@ -58,8 +68,6 @@ class SubscribeSerializer(serializers.ModelSerializer):
         return value
 
     def to_representation(self, instance):
-        request = self.context.get('request')
-        context = {'request': request}
         return ShowSubscriptionsSerializer(
             instance.author,
-            context=context).data
+            context=self.context).data

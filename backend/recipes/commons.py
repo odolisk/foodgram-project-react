@@ -4,7 +4,7 @@ from rest_framework import serializers
 from .models import Recipe
 
 
-class FavShopCartSubsRecipeSerializer(serializers.ModelSerializer):
+class ShortRecipeSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=True)
 
     class Meta:
@@ -15,8 +15,6 @@ class FavShopCartSubsRecipeSerializer(serializers.ModelSerializer):
 class ShowRecipeSerializerMixin:
 
     def to_representation(self, instance):
-        request = self.context.get('request')
-        context = {'request': request}
-        return FavShopCartSubsRecipeSerializer(
+        return ShortRecipeSerializer(
             instance.recipe,
-            context=context).data
+            context=self.context).data

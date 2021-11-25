@@ -1,13 +1,12 @@
-from django.conf import settings
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from recipes.views import CreateDeleteObjMixin
+from foodgram_api.mixins import CreateDeleteObjMixin
+from foodgram_api.pagination import CustomPagination
 from .models import Subscription, User
-from .pagination import CustomPagination
 from .serializers import ShowSubscriptionsSerializer, SubscribeSerializer
 
 
@@ -45,23 +44,11 @@ class FoodGramUserViewSet(CreateDeleteObjMixin, UserViewSet):
     @action(detail=False, methods=('GET',),
             permission_classes=(permissions.IsAuthenticated,))
     def subscriptions(self, request):
-        users = User.objects.filter(subs_authors__user=request.user)
-        paginator = CustomPagination()
-        page = paginator.paginate_queryset(users, request)
-        param = request.query_params.get(
-            'recipes_limit')
-        try:
-            recipes_limit = int(param)
-            if recipes_limit < 1:
-                raise ValueError
-        except (ValueError, TypeError):
-            recipes_limit = settings.DEFAULT_RECIPES_LIMIT
+        users = User.objects.filter(authors__user=request.user)
+        page = self.paginator.paginate_queryset(users, request)
         serializer = ShowSubscriptionsSerializer(
             page,
             many=True,
-            context={
-                'request': request,
-                'recipes_limit': recipes_limit
-            }
+            context={'request': request}
         )
-        return paginator.get_paginated_response(serializer.data)
+        return self.paginator.get_paginated_response(serializer.data)

@@ -1,11 +1,15 @@
 from django.contrib import admin
 from django.urls import include, path
 
-PREFIX = 'api/'
+PREFIX = 'api'
+
+api_patterns = [
+    path('users/', include('users.urls')),
+    path('auth/', include('djoser.urls.authtoken')),
+    path('', include('recipes.urls'))
+]
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path(f'{PREFIX}users/', include('users.urls')),
-    path(f'{PREFIX}auth/', include('djoser.urls.authtoken')),
-    path(f'{PREFIX}', include('recipes.urls')),
+    path(f'{PREFIX}/', include(api_patterns))
 ]
