@@ -59,6 +59,7 @@ def generate_PDF(ingredient_list):
         height -= 20
         if height <= 20:
             doc.showPage()
+            height = 800
     doc.showPage()
     doc.save()
     return response
