@@ -6,7 +6,6 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
-from reportlab.platypus.flowables import PageBreak
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -59,7 +58,7 @@ def generate_PDF(ingredient_list):
         doc.drawString(75, height, list_elem)
         height -= 20
         if height <= 20:
-            doc.append(PageBreak())
+            doc.showPage()
     doc.showPage()
     doc.save()
     return response
