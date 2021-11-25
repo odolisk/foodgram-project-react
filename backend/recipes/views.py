@@ -124,6 +124,7 @@ class RecipeViewSet(CreateDeleteObjMixin, viewsets.ModelViewSet):
 class TagViewSet(viewsets.ModelViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
+    pagination_class = None
     http_method_names = ('get',)
 
 
