@@ -3,7 +3,6 @@ from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework import permissions, status
 from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from recipes.views import CreateDeleteObjMixin
@@ -47,8 +46,7 @@ class FoodGramUserViewSet(CreateDeleteObjMixin, UserViewSet):
             permission_classes=(permissions.IsAuthenticated,))
     def subscriptions(self, request):
         users = User.objects.filter(subs_authors__user=request.user)
-        paginator = PageNumberPagination()
-        paginator.page_size = 6
+        paginator = CustomPagination()
         page = paginator.paginate_queryset(users, request)
         param = request.query_params.get(
             'recipes_limit')
