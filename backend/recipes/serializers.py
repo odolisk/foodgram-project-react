@@ -1,6 +1,8 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
+from django.core.validators import MinValueValidator
+
 from users.serializers import UserDetailSerializer
 from .commons import ShowRecipeSerializerMixin
 from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
@@ -46,7 +48,7 @@ class AddIngredientToRecipeSerializer(serializers.ModelSerializer):
     For representation Ingredient inside recipes.
     """
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
-    amount = serializers.IntegerField(min_value=1)
+    amount = serializers.IntegerField()
 
     class Meta:
         model = RecipeIngredient
@@ -70,6 +72,9 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def validate_ingredients(self, ingredients):
         uniq_ingredients = {}
         for ingredient in ingredients:
+            if int(ingredient['amount']) < 1:
+                raise serializers.ValidationError(
+                    'Значение "amount" должно быть больше 0.')
             uniq_ingredients[ingredient['id']] = uniq_ingredients.get(
                 ingredient['id'], 0) + ingredient['amount']
         validated_data = [
@@ -120,7 +125,7 @@ class RecipeShowSerializer(serializers.ModelSerializer):
     ingredients = IngredientInRecipeSerializer(
         source='recipe_for_ingredient', many=True)
     is_in_shopping_cart = serializers.SerializerMethodField()
-    is_favorited = serializers.SerializerMethodField()
+    is_favorited = serializers.BooleanField()
 
     class Meta:
         model = Recipe
@@ -134,9 +139,13 @@ class RecipeShowSerializer(serializers.ModelSerializer):
         if user.is_anonymous:
             return False
         return model.objects.filter(recipe=obj, user=user).exists()
+        # field = Q(**{field_name: })
+        # return model.objects.filter(
+        #     recipe=obj, user=user
+        # ).annotate(field_name=)
 
-    def get_is_favorited(self, obj):
-        return self.__get_is_any(obj, Favorite)
+    # def get_is_favorited(self, obj):
+    #     return self.__get_is_any(obj, Favorite)
 
     def get_is_in_shopping_cart(self, obj):
         return self.__get_is_any(obj, ShoppingCart)

@@ -1,7 +1,7 @@
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 
-from django.db.models import Sum
+from django.db.models import Exists, F, Sum
 from django.shortcuts import get_object_or_404
 
 from foodgram_api.mixins import CreateDeleteObjMixin
@@ -24,6 +24,16 @@ class RecipeViewSet(CreateDeleteObjMixin, viewsets.ModelViewSet):
     filterset_class = RecipeFilter
     permission_classes = (IsAuthorOrReadOnly,)
     http_method_names = ('get', 'post', 'put', 'patch', 'delete')
+
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     # return Recipe.objects.filter(
+    #     #     favor_recipe__user=user)
+    #     return Recipe.objects.annotate(
+    #         is_favorited=Exists(
+    #             Favorite.objects.filter(
+    #                 user=user,
+    #                 recipe=F('recipe'))))
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
