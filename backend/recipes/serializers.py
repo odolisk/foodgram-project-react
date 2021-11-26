@@ -1,8 +1,6 @@
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
-from django.core.validators import MinValueValidator
-
 from users.serializers import UserDetailSerializer
 from .commons import ShowRecipeSerializerMixin
 from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
@@ -61,7 +59,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=True)
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True)
-    cooking_time = serializers.IntegerField(min_value=1)
+    cooking_time = serializers.IntegerField()
 
     class Meta:
         model = Recipe
