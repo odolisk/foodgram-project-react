@@ -1,7 +1,7 @@
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 
-from django.db.models import Exists, Sum, OuterRef
+from django.db.models import Sum
 from django.shortcuts import get_object_or_404
 
 from foodgram_api.mixins import CreateDeleteObjMixin
@@ -19,28 +19,11 @@ from .utils import generate_PDF
 
 
 class RecipeViewSet(CreateDeleteObjMixin, viewsets.ModelViewSet):
+    queryset = Recipe.objects.all()
     pagination_class = CustomPagination
     filterset_class = RecipeFilter
     permission_classes = (IsAuthorOrReadOnly,)
     http_method_names = ('get', 'post', 'put', 'patch', 'delete')
-
-    def get_queryset(self):
-        user = self.request.user
-        return Recipe.objects.annotate(
-            is_favorited=Exists(
-                Favorite.objects.filter(
-                    recipe=OuterRef('id'),
-                    user=user
-                )
-            )
-        ).annotate(
-            is_in_shopping_cart=Exists(
-                ShoppingCart.objects.filter(
-                    recipe=OuterRef('id'),
-                    user=user
-                )
-            )
-        )
 
     def get_serializer_class(self):
         if self.request.method == 'GET':

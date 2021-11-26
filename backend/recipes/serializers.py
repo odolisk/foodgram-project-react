@@ -84,6 +84,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         if int(value) < 1:
             raise serializers.ValidationError(
                 'Время приготовления должно быть больше 0.')
+        return value
 
     def create(self, validated_data):
         tags = validated_data.pop('tags')
@@ -127,8 +128,8 @@ class RecipeShowSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=True)
     ingredients = IngredientInRecipeSerializer(
         source='recipe_for_ingredient', many=True)
-    is_in_shopping_cart = serializers.BooleanField()
-    is_favorited = serializers.BooleanField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
+    is_favorited = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
@@ -136,6 +137,18 @@ class RecipeShowSerializer(serializers.ModelSerializer):
                   'ingredients', 'is_favorited',
                   'is_in_shopping_cart', 'name',
                   'image', 'text', 'cooking_time')
+
+    def __get_is_any(self, obj, model):
+        user = self.context.get('request').user
+        if user.is_anonymous:
+            return False
+        return model.objects.filter(recipe=obj, user=user).exists()
+
+    def get_is_favorited(self, obj):
+        return self.__get_is_any(obj, Favorite)
+
+    def get_is_in_shopping_cart(self, obj):
+        return self.__get_is_any(obj, ShoppingCart)
 
 
 class FavoriteSerializer(ShowRecipeSerializerMixin,
