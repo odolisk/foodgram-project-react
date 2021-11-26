@@ -74,13 +74,18 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         for ingredient in ingredients:
             if int(ingredient['amount']) < 1:
                 raise serializers.ValidationError(
-                    'Значение "amount" должно быть больше 0.')
+                    'Количество ингредиента должно быть больше 0.')
             uniq_ingredients[ingredient['id']] = uniq_ingredients.get(
                 ingredient['id'], 0) + ingredient['amount']
         validated_data = [
             {'id': key,
              'amount': value} for key, value in uniq_ingredients.items()]
         return validated_data
+
+    def validate_cooking_time(self, value):
+        if int(value) < 1:
+            raise serializers.ValidationError(
+                'Время приготовления должно быть больше 0.')
 
     def create(self, validated_data):
         tags = validated_data.pop('tags')
