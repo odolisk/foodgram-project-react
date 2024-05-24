@@ -5,7 +5,7 @@ services:
     container_name: foodgram-db
     image: postgres:12.4
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data/
+      - ./postgres_data:/var/lib/postgresql/data/:z
     env_file:
       - .env
   web:
